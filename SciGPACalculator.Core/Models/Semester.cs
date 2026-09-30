@@ -1,21 +1,24 @@
 namespace GpaCalculator.Core.Models
 {
     /// <summary>
-    /// يمثل فصل دراسي واحد. الـ GPA بتاع الفصل ده بيتحسب من الـ Courses اللي جواه بس،
-    /// من غير أي تأثير من قاعدة الـ Retake (اتفقنا إن الـ 2H Cap بيتطبق بس وقت حساب
-    /// الـ CGPA التراكمي، مش على مستوى الفصل الواحد).
+    /// Represents a single academic semester.
+    /// The semester GPA is calculated only from the courses in this semester.
+    /// The Retake rule does not affect the semester GPA.
+    /// The 2H Cap is applied only when calculating the cumulative GPA (CGPA).
     /// </summary>
     public class Semester
     {
         public int SemesterId { get; set; }
 
         /// <summary>
-        /// مثلاً "الفصل الأول 2024" أو "Fall 2024".
+        /// The display name of the semester, such as "First Semester 2024"
+        /// or "Fall 2024".
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// الترتيب الزمني للفصل (1، 2، 3...) — مهم لعرض تطور الـ GPA بترتيب صحيح في الـ Chart.
+        /// The chronological order of the semester (1, 2, 3, ...).
+        /// This is used to display GPA progress in the correct order on charts.
         /// </summary>
         public int Order { get; set; }
 

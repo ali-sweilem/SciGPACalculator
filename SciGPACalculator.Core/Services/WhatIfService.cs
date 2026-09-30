@@ -3,8 +3,9 @@ using GpaCalculator.Core.Models;
 namespace GpaCalculator.Core.Services
 {
     /// <summary>
-    /// مقرر افتراضي هيدخله المستخدم في أداة الـ What-If (مادة جديدة، أو مادة سبق ورسب فيها
-    /// ودلوقتي عايز يعرف توقع النجاح فيها بدرجة معينة).
+    /// A hypothetical course entered by the user for the What-If tool.
+    /// It can be a new course or a course the student previously failed
+    /// and wants to simulate passing with a specific grade.
     /// </summary>
     public class WhatIfCourseInput
     {
@@ -17,17 +18,17 @@ namespace GpaCalculator.Core.Services
     public class WhatIfResult
     {
         /// <summary>
-        /// الـ CGPA الحالي الحقيقي، قبل أي محاكاة (للمقارنة في الواجهة).
+        /// The actual current CGPA before any simulation, used for comparison in the UI.
         /// </summary>
         public decimal? CurrentCgpa { get; set; }
 
         /// <summary>
-        /// الـ CGPA المتوقع لو اتحققت السيناريوهات الافتراضية.
+        /// The predicted CGPA if the hypothetical scenarios are applied.
         /// </summary>
         public decimal? PredictedCgpa { get; set; }
 
         /// <summary>
-        /// تحذيرات (زي محاولة محاكاة مادة ناجح فيها الطالب بالفعل).
+        /// Warnings, such as trying to simulate a course the student has already passed.
         /// </summary>
         public List<string> Warnings { get; set; } = new();
     }
@@ -35,9 +36,10 @@ namespace GpaCalculator.Core.Services
     public static class WhatIfService
     {
         /// <summary>
-        /// بيحسب الـ CGPA المتوقع لو الطالب جاب الدرجات الافتراضية دي في المقررات المحددة،
-        /// من غير ما يعدّل على البيانات الحقيقية المحفوظة إطلاقًا (Simulation بحتة).
-        /// القايمة ممكن تكون مقرر واحد بس أو أكتر (اختياري حسب طلبك).
+        /// Calculates the predicted CGPA if the student gets the specified hypothetical grades
+        /// in the selected courses, without modifying the saved data at all.
+        /// This is a pure simulation.
+        /// The list can contain one or more courses, depending on the user's request.
         /// </summary>
         public static WhatIfResult Simulate(
             IEnumerable<Semester> actualSemesters,
@@ -60,17 +62,18 @@ namespace GpaCalculator.Core.Services
 
                 if (alreadyPassed)
                 {
-                    // النظام لا يدعم إعادة مادة ناجح فيها الطالب أصلاً بالفعل (لا يوجد Improvement Retake).
-                    // بنتجاهل المحاولة الافتراضية دي بدل ما نسيب الـ Resolver يتعامل معاها
-                    // كأنها محاولة تحسين، وهيبلّغ المستخدم ليه.
+                    // The system does not support retaking a course the student has already passed
+                    // for grade improvement. We ignore this hypothetical attempt instead of letting
+                    // the Resolver treat it as an improvement retake, and inform the user why.
                     warnings.Add(
                         $"تحذير: المادة '{input.CourseCode}' مسجلة بالفعل كناجحة، " +
                         "والنظام لا يدعم إعادة مادة لتحسين الدرجة - تم تجاهل هذا السيناريو.");
                     continue;
                 }
 
-                // بيتضاف كـ Course عادي، مربوط بنفس الـ CourseCode. لو فيه محاولة فاشلة حقيقية
-                // بنفس الكود، الـ Resolver هيتعرف عليها تلقائيًا ويطبّق قاعدة الـ 2H.
+                // Add it as a normal Course with the same CourseCode. If there is an actual
+                // failed attempt with the same code, the Resolver will detect it automatically
+                // and apply the 2H rule.
                 simulatedAdditions.Add(new Course
                 {
                     CourseCode = input.CourseCode,
@@ -78,7 +81,7 @@ namespace GpaCalculator.Core.Services
                     CreditHours = input.CreditHours,
                     Percentage = input.HypotheticalPercentage,
                     IsRetake = existingRecordsForCode.Any(),
-                    SemesterId = null // مقرر افتراضي مش مربوط بترم حقيقي
+                    SemesterId = null // Hypothetical course is not linked to a real semester.
                 });
             }
 

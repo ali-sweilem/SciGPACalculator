@@ -1,32 +1,44 @@
 namespace GpaCalculator.Core.Models
 {
     /// <summary>
-    /// جدول تحويل النسبة المئوية إلى Grade Points، مبني على اللائحة الرسمية للكلية.
+    /// Defines the conversion from percentage grades to Grade Points,
+    /// based on the official college grading scale.
     ///
-    /// اللائحة مش تقديرات منفصلة فعليًا - هي معادلة خطية متصلة من 60% لـ 100%
-    /// (0.1 نقطة لكل 1%)، والحروف (A, B, C, D) مجرد تسميات فوق نفس المعادلة المستمرة.
-    /// اتأكد من كده بمقارنة حدود كل تقدير: عند 60% (بداية D) = 1.0، عند 65% (بداية C) = 1.5،
-    /// عند 75% (بداية B) = 2.5، عند 85% (بداية A) = 3.5، عند 100% = 5.0 - كلهم مطابقين
-    /// للائحة الرسمية بالظبط، فمفيش قفزات بين التقديرات، الانتقال ناعم.
+    /// The grading scale is a continuous linear formula from 60% to 100%,
+    /// where each additional 1% adds 0.1 Grade Points.
+    /// The letter grades (A, B, C, D) are labels applied to ranges within
+    /// the same continuous formula.
+    ///
+    /// For example:
+    /// 60% = 1.0, 65% = 1.5, 75% = 2.5, 85% = 3.5, and 100% = 5.0.
+    /// This means there are no gaps between grade ranges.
     /// </summary>
     public static class GradeScale
     {
         public const decimal PassingPercentage = 60m;
 
-        /// <summary>النقط عند أقل نسبة نجاح (60%) بالظبط - نقطة بداية المعادلة الخطية.</summary>
+        /// <summary>
+        /// The Grade Points at the minimum passing percentage (60%).
+        /// This is the starting point of the linear formula.
+        /// </summary>
         private const decimal PointsAtPassingThreshold = 1.0m;
 
-        /// <summary>معدل الزيادة: كل 1% فوق حد النجاح بيضيف 0.1 نقطة، ثابت عبر اللائحة كلها.</summary>
+        /// <summary>
+        /// The Grade Point increase for each additional percentage point.
+        /// Each 1% above the passing threshold adds 0.1 points.
+        /// </summary>
         private const decimal PointsPerPercentagePoint = 0.1m;
 
-        /// <summary>أعلى Points ممكن الوصول له فعليًا (عند 100%) = 5.0.</summary>
+        /// <summary>
+        /// The maximum possible Grade Points, reached at 100%.
+        /// </summary>
         public static decimal MaxPossiblePoints => ToPoints(100m);
 
         public static bool IsPassing(decimal percentage) => percentage >= PassingPercentage;
 
         /// <summary>
-        /// بيحوّل النسبة المئوية لـ Points حسب المعادلة الخطية الرسمية.
-        /// راسب (أقل من 60%) = صفر دايمًا، بغض النظر عن قيمة النسبة بالظبط.
+        /// Converts a percentage grade to Grade Points using the official linear formula.
+        /// A failing grade below 60% always results in 0 points.
         /// </summary>
         public static decimal ToPoints(decimal percentage)
         {
@@ -36,7 +48,8 @@ namespace GpaCalculator.Core.Models
         }
 
         /// <summary>
-        /// التسمية الحرفية (A/B/C/D/F) - للعرض بس، مش بتُستخدم في أي حساب فعلي.
+        /// Returns the letter grade (A/B/C/D/F) for display purposes only.
+        /// The letter grade is not used in any calculations.
         /// </summary>
         public static string ToLetter(decimal percentage)
         {
@@ -48,9 +61,10 @@ namespace GpaCalculator.Core.Models
         }
 
         /// <summary>
-        /// عكس المعادلة: أقل نسبة مئوية بتحقق عدد Points معين. بيتستخدم في اقتراح
-        /// "محتاج تقريبًا كام%" في أداة الـ Target GPA.
-        /// بيرجع null لو الـ Points المطلوبة مستحيلة (أعلى من MaxPossiblePoints).
+        /// Calculates the minimum percentage required to achieve a specific number
+        /// of Grade Points. This is used by the Target GPA tool to suggest
+        /// the approximate percentage needed.
+        /// Returns null if the required points are higher than the maximum possible points.
         /// </summary>
         public static decimal? MinimumPercentageForPoints(decimal requiredPoints)
         {

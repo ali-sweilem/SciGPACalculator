@@ -1,0 +1,130 @@
+<UserControl x:Class="GpaCalculator.WPF.Views.DataEntryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <DockPanel Margin="12">
+
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Content="+ إضافة فصل دراسي جديد"
+                        Command="{Binding AddSemesterCommand}"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Margin="0,0,8,0"/>
+                <Button Content="📂 استيراد من ملف CSV"
+                        Command="{Binding ImportCsvCommand}"
+                        Style="{StaticResource SecondaryButtonStyle}"/>
+            </StackPanel>
+
+            <TextBlock Style="{StaticResource HintTextStyle}" FontSize="12">
+                ملاحظة مهمة: لو رسبت في مادة وأعدتها، <Bold>ضيف صف جديد</Bold> ليها بالدرجة الجديدة
+                (مش تعدّل على الصف القديم مباشرة) - علشان الحساب يعرف إنها إعادة ويحسبها صح حسب لائحة الكلية.
+            </TextBlock>
+        </StackPanel>
+
+        <Grid>
+            <TextBlock Text="لسه مفيش فصول مُضافة. دوس على «+ إضافة فصل دراسي جديد» فوق للبدء."
+                       Style="{StaticResource EmptyStateTextStyle}"
+                       Visibility="{Binding HasNoSemesters, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Semesters}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                                <StackPanel>
+
+                                    <DockPanel Margin="0,0,0,10">
+                                        <Button DockPanel.Dock="Right"
+                                                Content="حذف الفصل بالكامل"
+                                                Style="{StaticResource DangerButtonStyle}"
+                                                Command="{Binding DataContext.RemoveSemesterCommand,
+                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                                 FontWeight="Bold" FontSize="16"
+                                                 Width="250" HorizontalAlignment="Left"
+                                                 Padding="4"/>
+                                    </DockPanel>
+
+                                    <DataGrid ItemsSource="{Binding Courses}"
+                                              AutoGenerateColumns="False"
+                                              CanUserAddRows="False"
+                                              RowHeight="32"
+                                              HeadersVisibility="Column">
+
+                                        <DataGrid.RowStyle>
+                                            <Style TargetType="DataGridRow">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsFailing}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
+                                                        <Setter Property="FontWeight" Value="Bold"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DataGrid.RowStyle>
+
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="اسم المقرر"
+                                                                 Binding="{Binding CourseName, UpdateSourceTrigger=PropertyChanged}"
+                                                                 Width="2*"/>
+
+                                            <DataGridTextColumn Header="الساعات المعتمدة"
+                                                                 Binding="{Binding CreditHours, UpdateSourceTrigger=PropertyChanged,
+                                                                           ValidatesOnDataErrors=True}"
+                                                                 Width="*"
+                                                                 ElementStyle="{StaticResource NumericDisplayStyle}"
+                                                                 EditingElementStyle="{StaticResource NumericEditStyle}"/>
+
+                                            <DataGridTextColumn Header="النسبة %"
+                                                                 Binding="{Binding Percentage, UpdateSourceTrigger=PropertyChanged,
+                                                                           ValidatesOnDataErrors=True}"
+                                                                 Width="*"
+                                                                 ElementStyle="{StaticResource NumericDisplayStyle}"
+                                                                 EditingElementStyle="{StaticResource NumericEditStyle}"/>
+
+                                            <!-- تنبيه الرسوب/النجاح في نفس الصف - يظهر بس لما الكشف يتفعّل -->
+                                            <DataGridTemplateColumn Header="" Width="40">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Button Content="⚠"
+                                                                Visibility="{Binding ShowRetakeWarning,
+                                                                             Converter={StaticResource BoolToVisibilityConverter}}"
+                                                                Command="{Binding DismissWarningCommand}"
+                                                                Foreground="{StaticResource WarningBrush}"
+                                                                Background="Transparent" BorderThickness="0"
+                                                                FontSize="16" FontWeight="Bold" Cursor="Hand"
+                                                                ToolTip="لاحظنا إنك غيّرت نسبة كانت أقل من 60% لنسبة ناجحة في نفس السطر.&#x0a;لو دي إعادة فعلية للمادة بعد رسوب: رجّع النسبة القديمة هنا، وضيف صف جديد للمحاولة الناجحة بدالها.&#x0a;لو كانت غلطة كتابة بس، دوس هنا لإخفاء التنبيه."/>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+
+                                            <DataGridTemplateColumn Header="حذف" Width="55">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Button Content="X"
+                                                                Style="{StaticResource IconButtonStyle}"
+                                                                Command="{Binding DataContext.RemoveCourseCommand,
+                                                                          RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                                CommandParameter="{Binding}"/>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <Button Content="+ إضافة مقرر"
+                                            Command="{Binding AddCourseCommand}"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="0,10,0,0"/>
+
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+    </DockPanel>
+</UserControl>

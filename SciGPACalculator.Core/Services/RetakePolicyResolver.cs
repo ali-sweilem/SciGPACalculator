@@ -3,14 +3,16 @@ using GpaCalculator.Core.Models;
 namespace GpaCalculator.Core.Services
 {
     /// <summary>
-    /// نتيجة تطبيق قاعدة الـ Retake على مادة واحدة (بعد تجميع كل محاولاتها).
-    /// دي "المساهمة النهائية" للمادة في أي حساب تراكمي (CGPA)، مش السجلات الخام.
+    /// Represents the final contribution of one course after applying the Retake rule
+    /// and grouping all of its attempts.
+    /// This represents the final contribution used in cumulative GPA (CGPA) calculations,
+    /// not the raw course records.
     /// </summary>
     public class CourseContribution
     {
         public string CourseCode { get; set; } = string.Empty;
-        public decimal Points { get; set; }   // = Points-per-hour × Hours (مش النسبة، القيمة النهائية المضروبة)
-        public decimal Hours { get; set; }    // = الـ Denominator المُعدّل (H أو 2H)
+        public decimal Points { get; set; }   // Points-per-hour × Hours (the final weighted points value)
+        public decimal Hours { get; set; }    // The adjusted denominator (H or 2H)
         public bool HasEverFailed { get; set; }
         public bool CurrentlyPassed { get; set; }
     }
@@ -18,22 +20,24 @@ namespace GpaCalculator.Core.Services
     public static class RetakePolicyResolver
     {
         /// <summary>
-        /// الحد الأقصى لمضاعف الساعات لأي مادة، مهما تكرر رسوبها.
-        /// القيمة دي جاية حرفيًا من قاعدتك: "الرقم دا مش بيزيد عن الضعف مهما كان عدد مرات الرسوب".
+        /// The maximum hour multiplier for any course, regardless of how many times it was failed.
+        /// The value follows the rule that the hours cannot exceed twice the original course hours.
         /// </summary>
         private const decimal MaxHourMultiplier = 2m;
 
         /// <summary>
-        /// بياخد كل مقررات الطالب (مجمّعة من كل الفصول)، ويرجّع مساهمة كل مادة (Group by CourseCode)
-        /// بعد تطبيق قاعدة الـ Retake. النتيجة دي هي اللي المفروض تتغذى بيها حسابات الـ CGPA،
-        /// مش الـ Course records الخام مباشرة.
+        /// Takes all courses across all semesters and returns the final contribution
+        /// for each course after applying the Retake rule.
+        /// Courses are grouped by CourseCode.
+        /// The returned contributions are used for CGPA calculations instead of
+        /// using the raw Course records directly.
         /// </summary>
         public static List<CourseContribution> Resolve(IEnumerable<Course> allCourses)
         {
             var results = new List<CourseContribution>();
 
             var groups = allCourses
-                .Where(c => c.Percentage.HasValue)   // تجاهل أي مقرر لسه معندوش درجة خالص
+                .Where(c => c.Percentage.HasValue)   // Ignore courses that do not have a grade yet.
                 .GroupBy(c => c.CourseCode);
 
             foreach (var group in groups)
@@ -44,9 +48,10 @@ namespace GpaCalculator.Core.Services
 
                 if (passingAttempts.Any())
                 {
-                    // اتفرض إن الطالب بيوقف عن إعادة المادة بمجرد ما ينجح فيها،
-                    // فمن المفروض يكون فيه محاولة ناجحة واحدة بس. لو حصل غلط إدخال
-                    // (أكتر من محاولة ناجحة لنفس المادة)، ناخد آخر واحدة كـ "النتيجة الرسمية".
+                    // It is assumed that the student stops retaking the course after passing it.
+                    // Therefore, there should normally be only one passing attempt.
+                    // If multiple passing attempts exist due to an input error,
+                    // the last one is treated as the official result.
                     var finalPass = passingAttempts.Last();
                     var hours = finalPass.CreditHours;
                     var hadPriorFailure = failingAttemptsCount > 0;
@@ -62,9 +67,9 @@ namespace GpaCalculator.Core.Services
                 }
                 else
                 {
-                    // لسه فاشل في المادة دي، مفيش نجاح لحد دلوقتي.
-                    // الـ Points = 0 دايمًا هنا (لأن مفيش محاولة ناجحة أصلاً).
-                    // الـ Hours بتتراكم عادي لحد ما توصل للـ Cap (2H)، وبعدها بتثبت.
+                    // The course is still failed because there is no passing attempt yet.
+                    // Points are always 0 because there is no successful attempt.
+                    // The hours increase with each failed attempt until reaching the 2H cap.
                     var hours = attempts.First().CreditHours;
                     var multiplier = Math.Min(failingAttemptsCount, (int)MaxHourMultiplier);
 

@@ -5,10 +5,13 @@ namespace GpaCalculator.Core.Services
     public static class GpaCalculatorService
     {
         /// <summary>
-        /// GPA الفصل الواحد. بيحسب من مقررات الفصل ده بس، من غير أي تأثير من قاعدة الـ Retake
-        /// (كل فصل بيعكس مجهود الطالب فيه هو بالظبط، والـ Retake Cap بيتطبق بس على مستوى
-        /// الـ CGPA التراكمي الكلي — ده الـ Alternative A اللي اتفقنا عليه).
-        /// بيرجع null لو مفيش أي مقرر متدرّج في الفصل، بدل ما يرجع 0 وهمي.
+        /// Calculates the GPA for a single semester.
+        /// It uses only the courses in that semester without applying the Retake rule.
+        /// Each semester reflects the student's actual performance during that semester.
+        /// The Retake Cap is applied only when calculating the overall cumulative GPA (CGPA).
+        ///
+        /// Returns null if the semester has no graded courses instead of returning
+        /// a misleading value of 0.
         /// </summary>
         public static decimal? CalculateSemesterGpa(Semester semester)
         {
@@ -22,8 +25,10 @@ namespace GpaCalculator.Core.Services
         }
 
         /// <summary>
-        /// الـ CGPA التراكمي الحالي، عبر كل الفصول، بعد تطبيق قاعدة الـ Retake
-        /// (مادة اتفشلت وبعدين نجحت بتتحسب بـ 2H مش H، ومادة لسه فاشلة بتتحسب حسب نفس المنطق).
+        /// Calculates the current cumulative GPA (CGPA) across all semesters
+        /// after applying the Retake rule.
+        /// A course that was failed and then passed is calculated using 2H instead of H,
+        /// and a course that is still failed follows the same policy.
         /// </summary>
         public static decimal? CalculateCumulativeGpa(IEnumerable<Semester> semesters)
         {

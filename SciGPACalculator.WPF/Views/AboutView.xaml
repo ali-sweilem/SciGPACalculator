@@ -1,0 +1,227 @@
+<UserControl x:Class="GpaCalculator.WPF.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="#F3F3F3">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="#EDEDED"
+                BorderBrush="#D0D0D0"
+                BorderThickness="0,0,0,1"
+                Padding="30,26">
+
+            <StackPanel HorizontalAlignment="Center">
+
+                <TextBlock Text="حاسبة المعدل التراكمي"
+                           FontSize="27"
+                           FontWeight="SemiBold"
+                           Foreground="#1F1F1F"
+                           HorizontalAlignment="Center"/>
+
+                <Border Width="45"
+                        Height="1"
+                        Background="{StaticResource PrimaryBrush}"
+                        Margin="0,12,0,10"/>
+
+                <TextBlock Text="مصمم خصيصًا لطلبة كلية العلوم - جامعة القاهرة"
+                           FontSize="13"
+                           Foreground="#666666"
+                           HorizontalAlignment="Center"/>
+
+            </StackPanel>
+        </Border>
+
+
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto">
+
+            <StackPanel MaxWidth="540"
+                        HorizontalAlignment="Center"
+                        Margin="25,30">
+
+                <TextBlock Text="المميزات"
+                           FontSize="19"
+                           FontWeight="SemiBold"
+                           Foreground="#252525"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,16"/>
+
+
+                <Border Background="White"
+                        BorderBrush="#D5D5D5"
+                        BorderThickness="1"
+                        Padding="24">
+
+                    <StackPanel>
+
+                        <!-- Feature 1 -->
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="18"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Ellipse Grid.Column="0"
+                                     Width="7"
+                                     Height="7"
+                                     Fill="{StaticResource PrimaryBrush}"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Top"
+                                     Margin="0,7,0,0"/>
+
+                            <TextBlock Grid.Column="1"
+                                       TextWrapping="Wrap"
+                                       FontSize="14"
+                                       LineHeight="24"
+                                       Foreground="#444444"
+                                       Text="حساب المعدل التراكمي (CGPA) حسب لائحة الكلية، بما فيها قاعدة إعادة المقررات الراسبة"/>
+                        </Grid>
+
+
+                        <!-- Feature 2 -->
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="18"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Ellipse Grid.Column="0"
+                                     Width="7"
+                                     Height="7"
+                                     Fill="{StaticResource PrimaryBrush}"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Top"
+                                     Margin="0,7,0,0"/>
+
+                            <TextBlock Grid.Column="1"
+                                       TextWrapping="Wrap"
+                                       FontSize="14"
+                                       LineHeight="24"
+                                       Foreground="#444444"
+                                       Text="توقع مستقبلي (What-If): معرفة تأثير الحصول على درجة معينة في مادة جديدة على المعدل التراكمي"/>
+                        </Grid>
+
+
+                        <!-- Feature 3 -->
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="18"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Ellipse Grid.Column="0"
+                                     Width="7"
+                                     Height="7"
+                                     Fill="{StaticResource PrimaryBrush}"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Top"
+                                     Margin="0,7,0,0"/>
+
+                            <TextBlock Grid.Column="1"
+                                       TextWrapping="Wrap"
+                                       FontSize="14"
+                                       LineHeight="24"
+                                       Foreground="#444444"
+                                       Text="حساب المعدل المستهدف (Target GPA): معرفة المتوسط المطلوب في المقررات المتبقية للوصول إلى هدف معين"/>
+                        </Grid>
+
+
+                        <!-- Feature 4 -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="18"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Ellipse Grid.Column="0"
+                                     Width="7"
+                                     Height="7"
+                                     Fill="{StaticResource PrimaryBrush}"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Top"
+                                     Margin="0,7,0,0"/>
+
+                            <TextBlock Grid.Column="1"
+                                       TextWrapping="Wrap"
+                                       FontSize="14"
+                                       LineHeight="24"
+                                       Foreground="#444444"
+                                       Text="استيراد مجموعة من المقررات مرة واحدة من ملف CSV بدلًا من إدخالها يدويًا"/>
+                        </Grid>
+
+                    </StackPanel>
+
+                </Border>
+
+
+                <TextBlock Text="عن البرنامج"
+                           FontSize="19"
+                           FontWeight="SemiBold"
+                           Foreground="#252525"
+                           HorizontalAlignment="Center"
+                           Margin="0,28,0,14"/>
+
+
+                <Border Background="#F8F8F8"
+                        BorderBrush="#D5D5D5"
+                        BorderThickness="1"
+                        Padding="22">
+
+                    <TextBlock TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               FontSize="13.5"
+                               LineHeight="23"
+                               Foreground="#666666"
+                               Text="أداة بسيطة تساعد طلاب كلية العلوم بجامعة القاهرة على متابعة سجلهم الأكاديمي، وحساب المعدل التراكمي، واستكشاف تأثير النتائج المستقبلية على معدلهم الدراسي."/>
+
+                </Border>
+
+            </StackPanel>
+
+        </ScrollViewer>
+
+
+        <!-- Footer -->
+        <Border Grid.Row="2"
+                Background="#EDEDED"
+                BorderBrush="#D0D0D0"
+                BorderThickness="0,1,0,0"
+                Padding="20,14">
+
+            <StackPanel HorizontalAlignment="Center">
+
+                <TextBlock HorizontalAlignment="Center"
+                           FontSize="13"
+                           Foreground="#666666">
+
+                    <Run Text="تطوير بواسطة "/>
+
+                    <Run Text="Ali Sweilem"
+                         FontWeight="SemiBold"
+                         Foreground="#333333"
+                         FlowDirection="LeftToRight"/>
+
+                </TextBlock>
+
+
+                <TextBlock Text="الإصدار 1.0"
+                           FontSize="11"
+                           Foreground="#888888"
+                           HorizontalAlignment="Center"
+                           Margin="0,4,0,0"/>
+
+            </StackPanel>
+
+        </Border>
+
+    </Grid>
+
+</UserControl>

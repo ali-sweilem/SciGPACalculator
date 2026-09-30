@@ -3,9 +3,10 @@ using GpaCalculator.Core.Models;
 namespace GpaCalculator.Core.Services
 {
     /// <summary>
-    /// مقرر متبقي على التخرج، هيتسجل في المستقبل. ممكن يكون مادة جديدة تمامًا،
-    /// أو مادة سبق ورسب فيها الطالب ولسه معدهاش (زي حالة "شرط التخرج" اللي ناقشناها) -
-    /// الحالة دي بتتحدد تلقائيًا من البيانات الفعلية، مش بإدخال يدوي.
+    /// A course remaining for graduation that will be taken in the future.
+    /// It can be a completely new course or a course the student previously failed
+    /// and has not passed yet. This case is detected automatically from the actual data,
+    /// not entered manually.
     /// </summary>
     public class RemainingCourseInput
     {
@@ -25,8 +26,9 @@ namespace GpaCalculator.Core.Services
         public bool AlreadyGuaranteed { get; set; }
 
         /// <summary>
-        /// أقرب تقدير عملي (زي "B+ / 85%") بيحقق المطلوب، بافتراض إنك هتجيب
-        /// نفس التقدير تقريبًا في كل المواد الباقية. تقريبي، مش دقيق لكل مادة على حدة.
+        /// The closest practical grade (such as "B+ / 85%") that meets the requirement,
+        /// assuming the student gets approximately the same grade in all remaining courses.
+        /// This is an estimate, not an exact result for each individual course.
         /// </summary>
         public string? SuggestedMinimumGrade { get; set; }
 
@@ -44,12 +46,13 @@ namespace GpaCalculator.Core.Services
             var remainingList = remainingCourses.ToList();
             var remainingCodes = remainingList.Select(r => r.CourseCode).ToHashSet();
 
-            // الـ CGPA الحالي المعروض للمستخدم - على كل بياناته الحقيقية زي ما هي، بدون استبعاد.
+            // The current CGPA displayed to the user uses all actual data as it is, without exclusions.
             var displayedCurrentCgpa = GpaCalculatorService.CalculateCumulativeGpa(actualSemesters);
 
-            // الـ Baseline المستخدم فعليًا في المعادلة: بيستبعد أي مادة موجودة في قايمة
-            // "المتبقي" لأنها هتتحل بالكامل عن طريق الـ Weighted Remaining Hours تحت،
-            // ومنعًا لتكرار حساب ساعاتها مرتين (مرة كرسوب حالي، ومرة كمتبقي مستقبلي).
+            // The baseline used in the calculation excludes any course listed as remaining
+            // because it will be fully handled by the Weighted Remaining Hours below.
+            // This prevents its hours from being counted twice: once as a current failure
+            // and once as a future remaining course.
             var settledCourses = actualCourses.Where(c => !remainingCodes.Contains(c.CourseCode));
             var settledContributions = RetakePolicyResolver.Resolve(settledCourses);
 

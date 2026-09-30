@@ -1,0 +1,173 @@
+<UserControl x:Class="GpaCalculator.WPF.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="14">
+        <StackPanel>
+
+            <!-- المعدل التراكمي الحالي -->
+            <GroupBox Header="المعدل التراكمي الحالي" Margin="0,0,0,16" Padding="10">
+                <StackPanel>
+                    <TextBlock Text="{Binding CurrentCgpaDisplay}"
+                               Foreground="{Binding CurrentCgpa, Converter={StaticResource CgpaToColorConverter}}"
+                               FontSize="34" FontWeight="Bold"
+                               HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+                    <ItemsControl ItemsSource="{Binding SemesterSummaries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel Margin="0,3">
+                                    <TextBlock Text="{Binding GpaDisplay}" DockPanel.Dock="Right" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- What-If -->
+            <GroupBox Header="توقع مستقبلي (What-If)" Margin="0,0,0,16" Padding="10">
+                <StackPanel>
+                    <TextBlock Text="أضف مادة أو أكتر بدرجة افتراضية، وشوف الـ CGPA المتوقع لو جبت الدرجة دي فعلًا"
+                               Style="{StaticResource HintTextStyle}" Margin="0,0,0,8"/>
+
+                    <DataGrid ItemsSource="{Binding WhatIf.Rows}"
+                              AutoGenerateColumns="False" CanUserAddRows="False" RowHeight="30">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="اسم المقرر"
+                                                 Binding="{Binding CourseName, UpdateSourceTrigger=PropertyChanged}"
+                                                 Width="2*"/>
+
+                            <DataGridTextColumn Header="الساعات"
+                                                 Binding="{Binding CreditHours, UpdateSourceTrigger=PropertyChanged,
+                                                           ValidatesOnDataErrors=True}"
+                                                 Width="*"
+                                                 ElementStyle="{StaticResource NumericDisplayStyle}"
+                                                 EditingElementStyle="{StaticResource NumericEditStyle}"/>
+
+                            <DataGridTextColumn Header="النسبة المتوقعة %"
+                                                 Binding="{Binding HypotheticalPercentage, UpdateSourceTrigger=PropertyChanged,
+                                                           ValidatesOnDataErrors=True}"
+                                                 Width="*"
+                                                 ElementStyle="{StaticResource NumericDisplayStyle}"
+                                                 EditingElementStyle="{StaticResource NumericEditStyle}"/>
+
+                            <DataGridTemplateColumn Header="حذف" Width="55">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="X"
+                                                Style="{StaticResource IconButtonStyle}"
+                                                Command="{Binding DataContext.WhatIf.RemoveRowCommand,
+                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                        <Button Content="+ إضافة مادة" Command="{Binding WhatIf.AddRowCommand}"
+                                Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
+                        <Button Content="احسب الـ CGPA المتوقع" Command="{Binding WhatIf.SimulateCommand}"
+                                Style="{StaticResource PrimaryButtonStyle}"/>
+                    </StackPanel>
+
+                    <Border Style="{StaticResource ResultBoxStyle}">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="{Binding WhatIf.PredictedCgpaDisplay}"
+                                           Foreground="{Binding WhatIf.PredictedCgpa, Converter={StaticResource CgpaToColorConverter}}"
+                                           FontSize="24" FontWeight="Bold" DockPanel.Dock="Right"/>
+                                <TextBlock Text="الـ CGPA المتوقع:" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock Text="{Binding WhatIf.CurrentCgpaDisplay}" DockPanel.Dock="Right" Opacity="0.7"/>
+                                <TextBlock Text="الحالي حاليًا:" Opacity="0.7"/>
+                            </DockPanel>
+                            <ItemsControl ItemsSource="{Binding WhatIf.Warnings}" Margin="0,6,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Target GPA -->
+            <GroupBox Header="المعدل المستهدف (Target GPA)" Padding="10">
+                <StackPanel>
+                    <TextBlock Text="حدد الـ CGPA اللي عايز توصله، وأضف المواد المتبقية على التخرج، واعرف المتوسط المطلوب"
+                               Style="{StaticResource HintTextStyle}" Margin="0,0,0,8"/>
+
+                    <DockPanel Margin="0,0,0,10">
+                        <TextBlock Text="الهدف:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Text="{Binding TargetGpa.TargetCgpa, UpdateSourceTrigger=PropertyChanged,
+                                        ValidatesOnDataErrors=True}"
+                                 Width="80" Padding="4" HorizontalAlignment="Left"
+                                 Style="{StaticResource NumericEditStyle}"/>
+                    </DockPanel>
+
+                    <DataGrid ItemsSource="{Binding TargetGpa.Rows}"
+                              AutoGenerateColumns="False" CanUserAddRows="False" RowHeight="30">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="اسم المقرر"
+                                                 Binding="{Binding CourseName, UpdateSourceTrigger=PropertyChanged}"
+                                                 Width="2*"/>
+
+                            <DataGridTextColumn Header="الساعات"
+                                                 Binding="{Binding CreditHours, UpdateSourceTrigger=PropertyChanged,
+                                                           ValidatesOnDataErrors=True}"
+                                                 Width="*"
+                                                 ElementStyle="{StaticResource NumericDisplayStyle}"
+                                                 EditingElementStyle="{StaticResource NumericEditStyle}"/>
+
+                            <DataGridTemplateColumn Header="حذف" Width="55">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="X"
+                                                Style="{StaticResource IconButtonStyle}"
+                                                Command="{Binding DataContext.TargetGpa.RemoveRowCommand,
+                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                        <Button Content="+ إضافة مادة متبقية" Command="{Binding TargetGpa.AddRowCommand}"
+                                Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
+                        <Button Content="احسب المطلوب" Command="{Binding TargetGpa.CalculateCommand}"
+                                Style="{StaticResource PrimaryButtonStyle}"/>
+                    </StackPanel>
+
+                    <Border Style="{StaticResource ResultBoxStyle}">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="{Binding TargetGpa.RequiredAverageDisplay}"
+                                           Foreground="{Binding TargetGpa.RequiredAveragePoints, Converter={StaticResource CgpaToColorConverter}}"
+                                           FontSize="24" FontWeight="Bold" DockPanel.Dock="Right"/>
+                                <TextBlock Text="متوسط النقط المطلوب:" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock Text="{Binding TargetGpa.SuggestedGrade}" Margin="0,4,0,0" FontWeight="Bold"/>
+                            <ItemsControl ItemsSource="{Binding TargetGpa.Messages}" Margin="0,6,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
