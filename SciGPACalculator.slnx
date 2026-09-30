@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SciGPACalculator.Core/SciGPACalculator.Core.csproj" />
+  <Project Path="SciGPACalculator.Tests/SciGPACalculator.Tests.csproj" />
+</Solution>
