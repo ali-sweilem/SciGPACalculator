@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SciGPACalculator.Core\SciGPACalculator.Core.csproj" />
+    <Resource Include="Resources\app-icon.ico" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -10,6 +11,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\app-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
